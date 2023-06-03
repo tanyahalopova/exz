@@ -1,0 +1,9 @@
+1;Egor Charntsev;5
+2;Rayan Gosling;100
+3;Aynur;3
+4;Eldar;4
+5;Dima;5
+6;Ilya;6
+7;Alya;7
+8;Maxim;8
+9;Kirill;9

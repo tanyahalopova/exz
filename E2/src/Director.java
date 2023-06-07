@@ -14,4 +14,12 @@ public class Director {
     public String getName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return "Director{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

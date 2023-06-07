@@ -1,56 +1,26 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static List<String> readFile(String path) {
-        List<String> lines = new ArrayList<>();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            String line;
-            while ((line = br.readLine()) != null) {
-                lines.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return lines;
-    }
-
 
     public static void main(String[] args) {
-        List<Actor> actors = new ArrayList<>();
-        for (String s : readFile("Actors.txt")) {
-            String[] values = s.split(";");
-            actors.add(new Actor(Integer.parseInt(values[0]), values[1], Integer.parseInt(values[2])));
-        }
 
-        List<Director> directors = new ArrayList<>();
-        for (String s : readFile("Directors.txt")) {
-            String[] values = s.split(";");
-            directors.add(new Director(Integer.parseInt(values[0]), values[1]));
-        }
-
-        List<Film> films = new ArrayList<>();
-        for (String s : readFile("Films.txt")) {
-            String[] values = s.split(";");
-            films.add(new Film(Integer.parseInt(values[0]), values[1], Integer.parseInt(values[2]), Integer.parseInt(values[3])));
-        }
-
-        List<Play> plays = new ArrayList<>();
-        for (String s : readFile("Plays.txt")) {
-            String[] values = s.split(";");
-            plays.add(new Play(Integer.parseInt(values[0]), Integer.parseInt(values[1])));
-        }
-
+        List<Actor> actors = Reader.readActors();
+        List<Director> directors = Reader.readDirectors();
+        List<Film> films = Reader.readFilms();
+        List<Play> plays = Reader.readPlays();
 
         for (Director director : directors) {
             for (Actor actor : actors) {
-                List<Integer> filmIds = films.stream().filter(film -> film.getDirectorId() == director.getId()).map(Film::getId).toList();
-                long c = plays.stream().filter(play -> filmIds.contains(play.getFilmId()) && actor.getId() == play.getActorId()).count();
+                List<Integer> filmIds = films.stream()
+                        .filter(film -> film.getDirectorId() == director.getId())
+                        .map(Film::getId).toList();
+                long c = plays.stream()
+                        .filter(play -> filmIds.contains(play.getFilmId()) && actor.getId() == play.getActorId())
+                        .count();
                 System.out.println(director.getName() + " and " + actor.getName() + " : " + c);
             }
         }
@@ -71,6 +41,33 @@ public class Main {
                 }
             }
             if (!filmsFiltered.isEmpty()) System.out.println(director.getName());
+        }
+
+        boolean answer = false;
+        for (Actor actor : actors) {
+            List<Integer> FilmIDs = plays.stream()
+                    .filter(play -> play.getActorId() == actor.getId())
+                    .map(Play::getFilmId)
+                    .toList();
+            List<Integer> DirectorsID = films.stream()
+                    .filter(film -> film.getYear() < 1990 && FilmIDs.contains(film.getId()))
+                    .map(Film::getDirectorId)
+                    .toList();
+            long c = directors.stream()
+                    .filter(director -> DirectorsID.contains(director.getId()))
+                    .count();
+            if (c > 3) {
+                answer = true;
+                break;
+            }
+        }
+        System.out.println(answer);
+
+        DirectorComparator d = new DirectorComparator(films);
+        Collections.sort(directors,d);
+
+        for (Director director : directors){
+           System.out.println(director.toString());
         }
     }
 }
